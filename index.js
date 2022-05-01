@@ -20,7 +20,7 @@ async function run() {
     await wait(parseInt(ms));
     core.info((new Date()).toTimeString());
 
-    const uipcliPath = await io.which('uipcli', true);
+    const uipcliPath = await io.which('uipcli.exe', true);
     await exec.exec('"${uipcliPath}"',['--version']);
 
     core.setOutput('time', new Date().toTimeString());
