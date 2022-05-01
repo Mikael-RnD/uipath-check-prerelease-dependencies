@@ -1,0 +1,14 @@
+# This workflow will trigger Datadog Synthetic tests within your Datadog organisation
+# For mor
+
+name: Test
+
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ./
