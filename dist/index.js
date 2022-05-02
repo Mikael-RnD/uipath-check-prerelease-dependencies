@@ -9834,7 +9834,7 @@ async function scanForPrereleaseDependency(projectJsonFile)
   var projectData;
   projectData = fetch(projectJsonFilePath).then(response => {
    return response.json();
-  }).then(projectData => projectData);
+  });
   
   console.log(projectData);
   return hasPrereleaseDependency;
