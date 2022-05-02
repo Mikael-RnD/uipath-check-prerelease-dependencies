@@ -47,12 +47,12 @@ async function scanForPrereleaseDependency(projectJsonFile)
   console.log('Scanning: ' + projectJsonFile);
   var hasPrereleaseDependency = false;
   var projectJsonFilePath = path.resolve(projectJsonFile);
-  var projectData;
-  projectData = fetch(projectJsonFilePath).then(response => {
-   return response.json();
-  });
+  var projectRawData = fs.readFileSync(projectJsonFilePath);
+  var parsedProjectData = JSON.parse(projectRawData);
   
   console.log(projectData);
+  console.log(projectRawData);
+  
   return hasPrereleaseDependency;
 }
 
