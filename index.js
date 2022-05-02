@@ -44,10 +44,11 @@ function recFindProjectJson(base,files,result)
 
 async function scanForPrereleaseDependency(projectJsonFile)
 {
+  console.log('Scanning: ' + projectJsonFile);
   var hasPrereleaseDependency = false;
   var projectJsonFilePath = path.resolve(projectJsonFile);
   var projectData;
-  fetch(projectJsonFilePath).then(response => {
+  projectData = fetch(projectJsonFilePath).then(response => {
    return response.json();
   }).then(projectData => projectData);
   
