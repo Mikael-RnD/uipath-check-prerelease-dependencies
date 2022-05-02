@@ -1,10 +1,10 @@
-name: 'Wait'
+name: 'UiPath Check prerelease dependency'
 description: 'Wait a designated number of milliseconds'
 inputs:
   workspace:  # id of input
     description: 'number of milliseconds to wait'
     required: true
-    default: '${{ GITHUB_WORKSPACE }}'
+    default: '${{ github.workspace }}'
 outputs:
   time: # output will be available to future steps
     description: 'The current time after waiting'
