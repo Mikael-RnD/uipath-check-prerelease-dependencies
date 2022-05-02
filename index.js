@@ -2,10 +2,9 @@ const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
 var path = require('path');
 const fs = require('fs');
-
 const wait = require('./wait');
 
-async function findProjectJsonFiles(workspace)
+/*async function findProjectJsonFiles(workspace)
 {
   var projectFiles = [];
   console.log('Checking workspace at: ' + workspace);
@@ -16,7 +15,7 @@ async function findProjectJsonFiles(workspace)
   console.log('Workspace contents: ' + workspaceContents);
 
   return projectFiles;
-}
+}*/
 
 function recFindProjectJson(base,files,result) 
 {
@@ -56,7 +55,7 @@ async function run() {
     var workspacePath = path.resolve(workspace);
     const projectFiles = recFindProjectJson(workspacePath);
     console.log(projectFiles);
-    
+
     projectFiles.forEach(scanForPrereleaseDependency);
     core.setOutput('time', new Date().toTimeString());
   } catch (error) {

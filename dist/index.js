@@ -5879,17 +5879,44 @@ const core = __nccwpck_require__(845);
 const tc = __nccwpck_require__(333);
 var path = __nccwpck_require__(17);
 const fs = __nccwpck_require__(147);
-
 const wait = __nccwpck_require__(9);
 
-async function findProjectJsonFiles(workspace)
+/*async function findProjectJsonFiles(workspace)
 {
+  var projectFiles = [];
   console.log('Checking workspace at: ' + workspace);
-  //core.
-  const workspacePath = path.resolve(workspace);
-  console.log(workspacePath);
-  const workspaceContents = fs.readdirSync(workspacePath);
-  console.log(workspaceContents);
+  var workspacePath = path.resolve(workspace);
+  console.log('Workspace path: ' + workspacePath);
+
+  var workspaceContents = fs.readdirSync(workspacePath, function(err,list));
+  console.log('Workspace contents: ' + workspaceContents);
+
+  return projectFiles;
+}*/
+
+function recFindProjectJson(base,files,result) 
+{
+    files = files || fs.readdirSync(base) 
+    result = result || [] 
+
+    files.forEach( 
+        function (file) {
+            var newbase = path.join(base,file)
+            if ( fs.statSync(newbase).isDirectory() )
+            {
+              result = recFindProjectJson(newbase,ext,fs.readdirSync(newbase),result);
+            }
+            else
+            {
+              
+              if ( path.basename(newbase) == 'project.json' )
+              {
+                result.push(newbase);
+              } 
+            }
+        }
+    )
+    return result
 }
 
 async function scanForPrereleaseDependency()
@@ -5901,7 +5928,11 @@ async function scanForPrereleaseDependency()
 async function run() {
   try {
     const workspace = core.getInput('workspace');
-    const projectFiles = await findProjectJsonFiles(workspace);
+    //const projectFiles = await findProjectJsonFiles(workspace);
+    var workspacePath = path.resolve(workspace);
+    const projectFiles = recFindProjectJson(workspacePath);
+    console.log(projectFiles);
+
     projectFiles.forEach(scanForPrereleaseDependency);
     core.setOutput('time', new Date().toTimeString());
   } catch (error) {
