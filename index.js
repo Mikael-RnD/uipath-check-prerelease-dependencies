@@ -1,28 +1,29 @@
 const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
-const github = require('@actions/github');
-const exec = require('@actions/exec');
-const io = require('@actions/io');
+var path = require('path');
+const fs = require('fs');
+
 const wait = require('./wait');
 
-async function findProjectJsonFiles()
+async function findProjectJsonFiles(workspace)
 {
-  JSON.parse('')
+  const workspacePath = path.format(workspace);
+  console.log(workspacePath);
+  const workspaceContents = fs.readdirSync(workspacePath);
+  console.log(workspaceContents);
+}
+
+async function scanForPrereleaseDependency()
+{
+
 }
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
-    
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
-
-    const uipcliPath = await io.which('uipcli.exe', true);
-    await exec.exec('"${uipcliPath}"',['--version']);
-
+    const workspace = core.getInput('workspace');
+    const projectFiles = await findProjectJsonFiles(workspace);
+    projectFiles.forEach(scanForPrereleaseDependency);
     core.setOutput('time', new Date().toTimeString());
   } catch (error) {
     core.setFailed(error.message);
