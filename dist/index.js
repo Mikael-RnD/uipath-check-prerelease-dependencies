@@ -5908,7 +5908,6 @@ function recFindProjectJson(base,files,result)
             }
             else
             {
-              
               if ( path.basename(newbase) == 'project.json' )
               {
                 result.push(newbase);
