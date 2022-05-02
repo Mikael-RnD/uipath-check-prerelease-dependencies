@@ -5904,7 +5904,7 @@ function recFindProjectJson(base,files,result)
             var newbase = path.join(base,file)
             if ( fs.statSync(newbase).isDirectory() )
             {
-              result = recFindProjectJson(newbase,ext,fs.readdirSync(newbase),result);
+              result = recFindProjectJson(newbase,fs.readdirSync(newbase),result);
             }
             else
             {
