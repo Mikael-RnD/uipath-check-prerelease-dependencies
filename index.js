@@ -41,9 +41,17 @@ function recFindProjectJson(base,files,result)
     return result
 }
 
-async function scanForPrereleaseDependency()
+async function scanForPrereleaseDependency(projectJsonFile)
 {
-
+  var hasPrereleaseDependency = false;
+  var projectJsonFilePath = path.resolve(projectJsonFile);
+  var projectData;
+  fetch(projectJsonFilePath).then(response => {
+   return response.json();
+  }).then(jsondata => projectData);
+  
+  console.log(projectData);
+  return hasPrereleaseDependency;
 }
 
 // most @actions toolkit packages have async methods

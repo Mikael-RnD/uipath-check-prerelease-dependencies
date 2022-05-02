@@ -1,7 +1,7 @@
 # This workflow will trigger Datadog Synthetic tests within your Datadog organisation
 # For mor
 
-name: Test
+name: Maually trigger this action
 
 on:
   workflow_dispatch:
