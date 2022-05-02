@@ -2,7 +2,6 @@ const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
 var path = require('path');
 const fs = require('fs');
-const fetch = require('node-fetch');
 const wait = require('./wait');
 
 /*async function findProjectJsonFiles(workspace)
@@ -50,10 +49,12 @@ async function scanForPrereleaseDependency(projectJsonFile)
   var projectRawData = fs.readFileSync(projectJsonFilePath);
   var parsedProjectData = JSON.parse(projectRawData);
   
-  console.log(parsedProjectData);
-  var dependencies = parsedProjectData('dependencies');
-  console.log('dependencies');
-  return hasPrereleaseDependency;
+  var dependencies = parsedProjectData['dependencies'];
+  console.log("Project " + parsedProjectData["name"] + " has the following dependencies: " + dependencies);
+  Object.entries(dependencies).map(item => {
+    console.log(item[0] + ": " + item[1])
+    core.setFailed(item[1])
+  });
 }
 
 // most @actions toolkit packages have async methods

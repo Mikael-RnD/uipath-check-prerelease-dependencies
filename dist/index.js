@@ -9589,6 +9589,14 @@ module.exports = eval("require")("encoding");
 
 /***/ }),
 
+/***/ 905:
+/***/ ((module) => {
+
+module.exports = eval("require")("find-versions");
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -9787,6 +9795,7 @@ const tc = __nccwpck_require__(333);
 var path = __nccwpck_require__(1017);
 const fs = __nccwpck_require__(7147);
 const fetch = __nccwpck_require__(941);
+const findVersion = __nccwpck_require__(905);
 const wait = __nccwpck_require__(6009);
 
 /*async function findProjectJsonFiles(workspace)
@@ -9834,9 +9843,12 @@ async function scanForPrereleaseDependency(projectJsonFile)
   var projectRawData = fs.readFileSync(projectJsonFilePath);
   var parsedProjectData = JSON.parse(projectRawData);
   
-  console.log(parsedProjectData);
-  var dependencies = parsedProjectData('dependencies');
-  console.log('dependencies');
+  var dependencies = parsedProjectData['dependencies'];
+  console.log("Project " + parsedProjectData["name"] + " has the following dependencies: " + dependencies);
+  Object.entries(parsedProjectData).map(item => {
+    console.log(item)
+  });
+
   return hasPrereleaseDependency;
 }
 
