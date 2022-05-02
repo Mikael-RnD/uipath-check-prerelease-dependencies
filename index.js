@@ -56,6 +56,7 @@ async function run() {
     var workspacePath = path.resolve(workspace);
     const projectFiles = recFindProjectJson(workspacePath);
     console.log(projectFiles);
+    
     projectFiles.forEach(scanForPrereleaseDependency);
     core.setOutput('time', new Date().toTimeString());
   } catch (error) {
