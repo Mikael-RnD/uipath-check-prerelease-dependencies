@@ -5884,6 +5884,7 @@ const wait = __nccwpck_require__(9);
 
 async function findProjectJsonFiles(workspace)
 {
+  console.log('Checking workspace at: ' + workspace);
   const workspacePath = path.format(workspace);
   console.log(workspacePath);
   const workspaceContents = fs.readdirSync(workspacePath);
