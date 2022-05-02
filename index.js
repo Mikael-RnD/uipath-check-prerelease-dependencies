@@ -71,7 +71,7 @@ async function run() {
     });
 
     if(projectsWithPrereleaseDependencies.length > 0 && errorLevel == '#error') {
-      core.setFailed(projectsWithPrereleaseDependencies.toString());
+      core.setFailed(JSON.stringify(projectsWithPrereleaseDependencies));
     } else if(projectsWithPrereleaseDependencies.length > 0 && errorLevel == '#warn'){
       core.notice();
     } else {
