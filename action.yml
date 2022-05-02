@@ -1,10 +1,14 @@
 name: 'UiPath Check prerelease dependency'
 description: 'Wait a designated number of milliseconds'
 inputs:
-  workspace:  # id of input
-    description: 'number of milliseconds to wait'
+  workspace:  
+    description: 'Folder path to start search in'
     required: true
     default: '${{ github.workspace }}'
+  errorLevel:
+    description: 'Determine if finding pre-release dependencies triggers errors or warning (#error, #warning)'
+    required: true
+    default: '#error'
 outputs:
   time: # output will be available to future steps
     description: 'The current time after waiting'
