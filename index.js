@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
 var path = require('path');
 const fs = require('fs');
+const fetch = require('node-fetch');
 const wait = require('./wait');
 
 /*async function findProjectJsonFiles(workspace)
@@ -19,26 +20,26 @@ const wait = require('./wait');
 
 function recFindProjectJson(base,files,result) 
 {
-    files = files || fs.readdirSync(base) 
-    result = result || [] 
+  files = files || fs.readdirSync(base) 
+  result = result || [] 
 
-    files.forEach( 
-        function (file) {
-            var newbase = path.join(base,file)
-            if ( fs.statSync(newbase).isDirectory() )
+  files.forEach( 
+      function (file) {
+          var newbase = path.join(base,file)
+          if ( fs.statSync(newbase).isDirectory() )
+          {
+            result = recFindProjectJson(newbase,fs.readdirSync(newbase),result);
+          }
+          else
+          {
+            if ( path.basename(newbase) == 'project.json' )
             {
-              result = recFindProjectJson(newbase,fs.readdirSync(newbase),result);
-            }
-            else
-            {
-              if ( path.basename(newbase) == 'project.json' )
-              {
-                result.push(newbase);
-              } 
-            }
-        }
-    )
-    return result
+              result.push(newbase);
+            } 
+          }
+      }
+  )
+  return result
 }
 
 async function scanForPrereleaseDependency(projectJsonFile)
@@ -48,7 +49,7 @@ async function scanForPrereleaseDependency(projectJsonFile)
   var projectData;
   fetch(projectJsonFilePath).then(response => {
    return response.json();
-  }).then(jsondata => projectData);
+  }).then(projectData => projectData);
   
   console.log(projectData);
   return hasPrereleaseDependency;
