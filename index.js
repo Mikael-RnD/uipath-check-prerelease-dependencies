@@ -50,9 +50,9 @@ async function scanForPrereleaseDependency(projectJsonFile)
   var projectRawData = fs.readFileSync(projectJsonFilePath);
   var parsedProjectData = JSON.parse(projectRawData);
   
-  console.log(projectData);
   console.log(projectRawData);
-  
+  console.log(parsedProjectData);
+
   return hasPrereleaseDependency;
 }
 
