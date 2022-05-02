@@ -1,8 +1,6 @@
 const core = require('@actions/core');
-const tc = require('@actions/tool-cache');
 var path = require('path');
 const fs = require('fs');
-const wait = require('./wait');
 
 /*
 * Recursively iterates through the base folder path to find any project.json files.
@@ -16,20 +14,20 @@ function recFindProjectJson(base,files,result)
   result = result || [] 
 
   files.forEach( 
-      function (file) {
-          var newbase = path.join(base,file)
-          if ( fs.statSync(newbase).isDirectory() )
+    function (file) {
+        var newbase = path.join(base,file)
+        if ( fs.statSync(newbase).isDirectory() )
+        {
+          result = recFindProjectJson(newbase,fs.readdirSync(newbase),result);
+        }
+        else
+        {
+          if ( path.basename(newbase) == 'project.json' )
           {
-            result = recFindProjectJson(newbase,fs.readdirSync(newbase),result);
-          }
-          else
-          {
-            if ( path.basename(newbase) == 'project.json' )
-            {
-              result.push(newbase);
-            } 
-          }
-      }
+            result.push(newbase);
+          } 
+        }
+    }
   )
   return result
 }
@@ -44,12 +42,23 @@ function hasPrereleaseDependency(projectJsonFile)
   var dependencies = parsedProjectData['dependencies'];
 
   Object.entries(dependencies).map(item => {
-    console.log(item[0] + ": " + item[1]);
+    
+    var libraryVersion = item[1];
+    
+    console.log(libraryVersion);
     //core.setFailed(item[1]);
   });
 
-  const projectDependencyInfo = { name: parsedProjectData['name'], hasPrereleaseDependencies: true, dependencies:dependencies}
+  const projectDependencyInfo = { name: parsedProjectData['name'], hasPrereleaseDependencies: true, prereleaseDependencies:dependencies}
   return projectDependencyInfo;
+}
+
+function setErrorMessage(projectsWithPrereleaseDependencies) {
+  var errorMessage;
+  projectsWithPrereleaseDependencies.forEach(project => {
+    console.log(project);
+  });
+  return errorMessage;
 }
 
 // most @actions toolkit packages have async methods
@@ -70,18 +79,19 @@ async function run() {
       }
     });
 
-    if(projectsWithPrereleaseDependencies.length > 0 && errorLevel == '#error') {
-      core.setFailed(JSON.stringify(projectsWithPrereleaseDependencies));
-    } else if(projectsWithPrereleaseDependencies.length > 0 && errorLevel == '#warn'){
-      core.notice();
+    if(projectsWithPrereleaseDependencies.length > 0) {
+      var errorMessage = setErrorMessage();
+      if(errorLevel == '#warn'){
+        core.warning(errorMessage);
+      }
+      if(errorLevel == '#error') {
+        core.setFailed(errorMessage);
+      }
     } else {
       console.log('No prerelease dependencies were found.');
     }
 
     console.log(projectsWithPrereleaseDependencies);
-
-    //projectFiles.forEach(hasPrereleaseDependency);
-    core.setOutput('time', new Date().toTimeString());
   } catch (error) {
     core.setFailed(error.message);
   }
