@@ -4,7 +4,7 @@ inputs:
   workspace:  # id of input
     description: 'number of milliseconds to wait'
     required: true
-    default: '${{ env.GITHUB_WORKSPACE }}'
+    default: '${{ github.workspace }}'
 outputs:
   time: # output will be available to future steps
     description: 'The current time after waiting'
