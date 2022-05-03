@@ -2023,10 +2023,16 @@ function hasPrereleaseDependency(projectJsonFile)
 }
 
 function setErrorMessage(projectsWithPrereleaseDependencies) {
-  var errorMessage;
+  var errorMessage ='';
   projectsWithPrereleaseDependencies.forEach(project => {
-    console.log(project);
+    errorMessage.concat(errorMessage, '\n','--------------------------------------------');
+    errorMessage.concat(errorMessage,'\n','The project:' + project['name'] + ' has the following prerelease dependencies: ');
+    Object.entries(project['prereleaseDependencies']).map(item => {
+      errorMessage.concat(errorMessage,'\n', item[0] + ":" + item[1]);
+    });
+    errorMessage.concat(errorMessage,'\n', '--------------------------------------------');
   });
+  console.warn(errorMessage);
   return errorMessage;
 }
 
@@ -2038,7 +2044,6 @@ async function run() {
     var workspacePath = path.resolve(workspace);
     const projectFiles = recFindProjectJson(workspacePath);
     console.log(projectFiles);
-    
     var projectsWithPrereleaseDependencies = [];
     projectFiles.forEach(project => {
       var projectDependencyInfo = hasPrereleaseDependency(project);
@@ -2049,6 +2054,7 @@ async function run() {
 
     if(projectsWithPrereleaseDependencies.length > 0) {
       var errorMessage = setErrorMessage(projectsWithPrereleaseDependencies);
+      console.log(errorMessage);
       if(errorLevel == '#warn'){
         core.warning(errorMessage);
       }
