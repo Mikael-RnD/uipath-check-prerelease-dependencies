@@ -53,6 +53,7 @@ function hasPrereleaseDependency(projectJsonFile)
 }
 
 function setErrorMessage(projectsWithPrereleaseDependencies) {
+  console.log('Setting error message.');
   var errorMessage ='';
   projectsWithPrereleaseDependencies.forEach(project => {
     errorMessage.concat(errorMessage, '\n','--------------------------------------------');
