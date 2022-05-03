@@ -1,73 +1,107 @@
 const core = require('@actions/core');
-const tc = require('@actions/tool-cache');
 var path = require('path');
 const fs = require('fs');
-const wait = require('./wait');
+const { stringify } = require('querystring');
 
-/*async function findProjectJsonFiles(workspace)
-{
-  var projectFiles = [];
-  console.log('Checking workspace at: ' + workspace);
-  var workspacePath = path.resolve(workspace);
-  console.log('Workspace path: ' + workspacePath);
-
-  var workspaceContents = fs.readdirSync(workspacePath, function(err,list));
-  console.log('Workspace contents: ' + workspaceContents);
-
-  return projectFiles;
-}*/
-
+/*
+* Recursively iterates through the base folder path to find any project.json files.
+* base = base directory to look in
+* files = list of files
+* result = list of project.json files
+*/
 function recFindProjectJson(base,files,result) 
 {
   files = files || fs.readdirSync(base) 
   result = result || [] 
 
   files.forEach( 
-      function (file) {
-          var newbase = path.join(base,file)
-          if ( fs.statSync(newbase).isDirectory() )
+    function (file) {
+        var newbase = path.join(base,file)
+        if ( fs.statSync(newbase).isDirectory() )
+        {
+          result = recFindProjectJson(newbase,fs.readdirSync(newbase),result);
+        }
+        else
+        {
+          if ( path.basename(newbase) == 'project.json' )
           {
-            result = recFindProjectJson(newbase,fs.readdirSync(newbase),result);
-          }
-          else
-          {
-            if ( path.basename(newbase) == 'project.json' )
-            {
-              result.push(newbase);
-            } 
-          }
-      }
+            result.push(newbase);
+          } 
+        }
+    }
   )
   return result
 }
 
-async function scanForPrereleaseDependency(projectJsonFile)
+function checkPrereleaseDependency(projectJsonFile)
 {
   console.log('Scanning: ' + projectJsonFile);
-  var hasPrereleaseDependency = false;
   var projectJsonFilePath = path.resolve(projectJsonFile);
   var projectRawData = fs.readFileSync(projectJsonFilePath);
   var parsedProjectData = JSON.parse(projectRawData);
   
   var dependencies = parsedProjectData['dependencies'];
-  console.log("Project " + parsedProjectData["name"] + " has the following dependencies: " + dependencies);
+  var prereleaseDependencies = [];
   Object.entries(dependencies).map(item => {
-    console.log(item[0] + ": " + item[1])
-    core.setFailed(item[1])
+    var libraryVersion = item[1];
+    if(libraryVersion.includes('beta') || libraryVersion.includes('alpha')){
+      prereleaseDependencies.push(libraryVersion);
+    }
+    console.log(libraryVersion);
   });
+
+  const projectDependencyInfo = { name: parsedProjectData['name'], prereleaseDependencies:prereleaseDependencies}
+  return projectDependencyInfo;
+}
+
+function setErrorMessage(projectsWithPrereleaseDependencies) {
+  console.log('Setting error message.');
+  var errorMessage ='';
+  projectsWithPrereleaseDependencies.forEach(project => {
+    errorMessage.concat(errorMessage, '\n','--------------------------------------------');
+    errorMessage.concat(errorMessage,'\n','The project:' + project['name'] + ' has the following prerelease dependencies: ');
+    Object.entries(project['prereleaseDependencies']).map(item => {
+      errorMessage.concat(errorMessage,'\n', item[0] + ":" + item[1]);
+    });
+    errorMessage.concat(errorMessage,'\n', '--------------------------------------------');
+  });
+  console.warn(errorMessage);
+  return errorMessage;
 }
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
     const workspace = core.getInput('workspace');
-    //const projectFiles = await findProjectJsonFiles(workspace);
+    const errorLevel = core.getInput('errorLevel');
     var workspacePath = path.resolve(workspace);
     const projectFiles = recFindProjectJson(workspacePath);
     console.log(projectFiles);
+    var projectsWithPrereleaseDependencies = [];
+    projectFiles.forEach(project => {
+      var projectDependencyInfo = checkPrereleaseDependency(project);
+      if(projectDependencyInfo['prereleaseDependencies'].length > 0) {
+        projectsWithPrereleaseDependencies.push(projectDependencyInfo);
+      }
+    });
 
-    projectFiles.forEach(scanForPrereleaseDependency);
-    core.setOutput('time', new Date().toTimeString());
+    if(projectsWithPrereleaseDependencies.length > 0) {
+      var errorMessage = setErrorMessage(projectsWithPrereleaseDependencies);
+      
+      console.log();
+      if(errorLevel == '#warn'){
+        console.warn(projectsWithPrereleaseDependencies);
+        core.warning(projectsWithPrereleaseDependencies);
+      }
+      if(errorLevel == '#error') {
+        console.error(projectsWithPrereleaseDependencies);
+        core.setFailed(projectsWithPrereleaseDependencies);
+      }
+    } else {
+      console.log('No prerelease dependencies were found.');
+    }
+
+    //console.log(projectsWithPrereleaseDependencies);
   } catch (error) {
     core.setFailed(error.message);
   }

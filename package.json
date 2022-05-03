@@ -27,7 +27,11 @@
   "dependencies": {
     "@actions/core": "^1.7.0",
     "@actions/github": "^5.0.1",
-    "@actions/tool-cache": "^1.7.2"
+    "@actions/tool-cache": "^1.7.2",
+    "find-versions": "^5.0.0",
+    "regex": "^0.1.1",
+    "regexp": "^1.0.0",
+    "semver-regex": "^4.0.2"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.33.4",
