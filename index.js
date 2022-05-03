@@ -46,7 +46,6 @@ function hasPrereleaseDependency(projectJsonFile)
     var libraryVersion = item[1];
     
     console.log(libraryVersion);
-    //core.setFailed(item[1]);
   });
 
   const projectDependencyInfo = { name: parsedProjectData['name'], hasPrereleaseDependencies: true, prereleaseDependencies:dependencies}
