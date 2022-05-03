@@ -66,7 +66,6 @@ async function run() {
   try {
     const workspace = core.getInput('workspace');
     const errorLevel = core.getInput('errorLevel');
-    //const projectFiles = await findProjectJsonFiles(workspace);
     var workspacePath = path.resolve(workspace);
     const projectFiles = recFindProjectJson(workspacePath);
     console.log(projectFiles);
@@ -80,7 +79,7 @@ async function run() {
     });
 
     if(projectsWithPrereleaseDependencies.length > 0) {
-      var errorMessage = setErrorMessage();
+      var errorMessage = setErrorMessage(projectsWithPrereleaseDependencies);
       if(errorLevel == '#warn'){
         core.warning(errorMessage);
       }
