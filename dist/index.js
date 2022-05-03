@@ -1910,6 +1910,14 @@ module.exports = require("path");
 
 /***/ }),
 
+/***/ 477:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("querystring");
+
+/***/ }),
+
 /***/ 404:
 /***/ ((module) => {
 
@@ -1970,6 +1978,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(845);
 var path = __nccwpck_require__(17);
 const fs = __nccwpck_require__(147);
+const { stringify } = __nccwpck_require__(477);
 
 /*
 * Recursively iterates through the base folder path to find any project.json files.
@@ -2001,7 +2010,7 @@ function recFindProjectJson(base,files,result)
   return result
 }
 
-function hasPrereleaseDependency(projectJsonFile)
+function checkPrereleaseDependency(projectJsonFile)
 {
   console.log('Scanning: ' + projectJsonFile);
   var projectJsonFilePath = path.resolve(projectJsonFile);
@@ -2009,15 +2018,16 @@ function hasPrereleaseDependency(projectJsonFile)
   var parsedProjectData = JSON.parse(projectRawData);
   
   var dependencies = parsedProjectData['dependencies'];
-
+  var prereleaseDependencies = [];
   Object.entries(dependencies).map(item => {
-    
     var libraryVersion = item[1];
-    
+    if(libraryVersion.includes('beta') || libraryVersion.includes('alpha')){
+      prereleaseDependencies.push(libraryVersion);
+    }
     console.log(libraryVersion);
   });
 
-  const projectDependencyInfo = { name: parsedProjectData['name'], hasPrereleaseDependencies: true, prereleaseDependencies:dependencies}
+  const projectDependencyInfo = { name: parsedProjectData['name'], prereleaseDependencies:prereleaseDependencies}
   return projectDependencyInfo;
 }
 
@@ -2046,19 +2056,22 @@ async function run() {
     console.log(projectFiles);
     var projectsWithPrereleaseDependencies = [];
     projectFiles.forEach(project => {
-      var projectDependencyInfo = hasPrereleaseDependency(project);
-      if(projectDependencyInfo['hasPrereleaseDependencies'] == true) {
+      var projectDependencyInfo = checkPrereleaseDependency(project);
+      if(projectDependencyInfo['prereleaseDependencies'].length > 0) {
         projectsWithPrereleaseDependencies.push(projectDependencyInfo);
       }
     });
 
     if(projectsWithPrereleaseDependencies.length > 0) {
       var errorMessage = setErrorMessage(projectsWithPrereleaseDependencies);
-      console.log(projectsWithPrereleaseDependencies);
+      
+      console.log();
       if(errorLevel == '#warn'){
+        console.warn(projectsWithPrereleaseDependencies);
         core.warning(projectsWithPrereleaseDependencies);
       }
       if(errorLevel == '#error') {
+        console.error(projectsWithPrereleaseDependencies);
         core.setFailed(projectsWithPrereleaseDependencies);
       }
     } else {
