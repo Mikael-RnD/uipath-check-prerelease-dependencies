@@ -2054,18 +2054,18 @@ async function run() {
 
     if(projectsWithPrereleaseDependencies.length > 0) {
       var errorMessage = setErrorMessage(projectsWithPrereleaseDependencies);
-      console.log(errorMessage);
+      console.log(projectsWithPrereleaseDependencies);
       if(errorLevel == '#warn'){
-        core.warning(errorMessage);
+        core.warning(projectsWithPrereleaseDependencies);
       }
       if(errorLevel == '#error') {
-        core.setFailed(errorMessage);
+        core.setFailed(projectsWithPrereleaseDependencies);
       }
     } else {
       console.log('No prerelease dependencies were found.');
     }
 
-    console.log(projectsWithPrereleaseDependencies);
+    //console.log(projectsWithPrereleaseDependencies);
   } catch (error) {
     core.setFailed(error.message);
   }
