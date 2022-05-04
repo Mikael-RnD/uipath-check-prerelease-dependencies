@@ -4,8 +4,8 @@ A GitHub Action for finding prerelease dependencies in UiPath project.json files
 ## How to use
 Example usage:
 
-      # Set up the UiPath CLI (uipcli) and add it to PATH on your runner
-      - name: Setup UiPath (uipcli) command line tool
+      # Scan project.json files for beta or alpha dependencies.
+      - name: Scan For Prerelease Dependencies
         uses: Mikael-RnD/uipath-check-prereleas-dependencies@main
         with:
           workspace: #Folder path where the search for project.json file starts. Recursively searches from here. Defaults to GitHub workspace
